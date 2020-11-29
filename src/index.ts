@@ -1,5 +1,12 @@
 import { SciChartSurface } from "scichart/Charting/Visuals/SciChartSurface";
 import { NumericAxis } from "scichart/Charting/Visuals/Axis/NumericAxis";
+import * as socketIOClient from "socket.io-client";
+
+async function main() {
+  await initSciChart();
+  initWebSocket();
+}
+main();
 
 async function initSciChart() {
   // LICENSING //
@@ -31,4 +38,20 @@ async function initSciChart() {
   // That's it! You just created your first SciChartSurface!
 }
 
-initSciChart();
+function initWebSocket() {
+  console.log("initWebSocket()");
+  const socket_ = socketIOClient.io("http://localhost:3000");
+
+  socket_.on("server_connected", (message: string) => {
+    console.log("server_connected", message);
+  });
+
+  socket_.on("server_some_message", (message: string) => {
+    console.log("server_some_message", message);
+  });
+
+  // send test message from the client
+  setTimeout(() => {
+    socket_.emit("client_some_message", "Some Message from the Client after 4 seconds");
+  }, 4000);
+}
